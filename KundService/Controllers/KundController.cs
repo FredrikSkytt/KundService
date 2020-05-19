@@ -85,6 +85,34 @@ namespace KundService.Controllers
             return CreatedAtRoute("DefaultApi", new { id = kund.Id }, kund);
         }
 
+        [ResponseType(typeof(Kund))]
+        public IHttpActionResult AddKund(string Email, string Losenord, string Fornamn, string Efternamn, string PersonNr, string TelefonNr, Kund Kund)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = (from Kunduser in db.Kund where Kunduser.Email == Email select Kunduser).ToList().Count();
+
+            if (result != 1)
+            {
+                Kund nyKund = new Kund();
+                nyKund.Email = Email;
+                nyKund.Losenord = Losenord;
+                nyKund.Fornamn = Fornamn;
+                nyKund.Efternamn = Efternamn;
+                nyKund.PersonNr = PersonNr;
+                nyKund.TelefonNr = TelefonNr;
+
+                db.Kund.Add(Kund);
+                db.SaveChanges();
+
+                return CreatedAtRoute("DefaultApi", new { id = Kund.Id }, Kund);
+            }
+
+            return NotFound();
+        }
+
         // DELETE: api/Kunds/5
         [ResponseType(typeof(Kund))]
         public IHttpActionResult DeleteKund(int id)
